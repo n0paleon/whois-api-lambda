@@ -1,0 +1,66 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  whois-api
+
+  Sample SAM Template for whois-api
+
+Globals:
+  Function:
+    Timeout: 30
+    MemorySize: 128
+    LoggingConfig:
+      LogFormat: JSON
+
+Resources:
+  # === Lambda Whois API ===
+  WhoisApiFunction:
+    Type: AWS::Serverless::Function
+    Metadata:
+      BuildMethod: go1.x
+    Properties:
+      CodeUri: src/
+      Handler: bootstrap
+      Runtime: provided.al2023
+      Architectures:
+        - arm64
+      Events:
+        GetAvailableTLDs:
+          Type: HttpApi
+          Properties:
+            Path: /available-tlds
+            Method: GET
+        SingleWhoisLookup:
+          Type: HttpApi
+          Properties:
+            Path: /whois/lookup
+            Method: POST
+        RawWhoisLookup:
+          Type: HttpApi
+          Properties:
+            Path: /whois/lookup/raw
+            Method: POST
+        MassWhoisLookup:
+          Type: HttpApi
+          Properties:
+            Path: /whois/mass-lookup
+            Method: POST
+        HealthCheck:
+          Type: HttpApi
+          Properties:
+            Path: /health-check
+            Method: GET
+      Environment:
+        Variables:
+          PARAM1: VALUE
+
+Outputs:
+  WhoisApiUrl:
+    Description: "API Gateway URL"
+    Value: !Sub "https://${ServerlessHttpApi}.execute-api.${AWS::Region}.amazonaws.com/"
+  WhoisApiFunction:
+    Description: First Lambda Function ARN
+    Value: !GetAtt WhoisApiFunction.Arn
+  WhoisApiFunctionIamRole:
+    Description: Implicit IAM Role created for Whois API function
+    Value: !GetAtt WhoisApiFunctionRole.Arn
