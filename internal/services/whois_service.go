@@ -2,27 +2,37 @@ package services
 
 import (
 	"context"
+	"errors"
 	"net/http"
 	"sync"
+	"time"
 
 	"whois-api-lambda/internal/adapters/workerpool"
 	"whois-api-lambda/internal/apperrors"
 	"whois-api-lambda/internal/domain"
 	"whois-api-lambda/internal/ports"
 	"whois-api-lambda/pkg/utils"
+
+	"github.com/sirupsen/logrus"
 )
 
 // WhoisService orchestrates WHOIS operations with domain normalization
 type WhoisService struct {
 	whoisClient   ports.WhoisClient
 	parserService ports.WhoisParser
+	cache         ports.CacheService
 }
 
+var (
+	defaultCacheTTL = 24 * time.Hour
+)
+
 // NewWhoisService creates a new WhoisService instance
-func NewWhoisService(whoisClient ports.WhoisClient, parserService ports.WhoisParser) *WhoisService {
+func NewWhoisService(whoisClient ports.WhoisClient, parserService ports.WhoisParser, cache ports.CacheService) *WhoisService {
 	return &WhoisService{
 		whoisClient:   whoisClient,
 		parserService: parserService,
+		cache:         cache,
 	}
 }
 
@@ -38,7 +48,31 @@ func (s *WhoisService) GetRawWhoisData(ctx context.Context, domain string) (stri
 		)
 	}
 
-	return s.whoisClient.Whois(ctx, punycodeDomain)
+	raw, err := s.cache.GetRaw(ctx, punycodeDomain)
+	if err == nil {
+		logrus.Debugf("Cache: successfully retrieved raw WHOIS response for %s", punycodeDomain)
+		return raw, nil
+	}
+	if !errors.Is(err, &apperrors.AppError{}) {
+		logrus.Errorf("Cache: failed to get raw WHOIS response from cache layer: %v", err.Error())
+	}
+
+	// Fetch live
+	raw, err = s.whoisClient.Whois(ctx, punycodeDomain)
+	if err != nil {
+		return "", err
+	}
+
+	// Cache raw asynchronously
+	_ = workerpool.Submit(func() {
+		if err := s.cache.SetRaw(ctx, punycodeDomain, raw, 24*time.Hour); err != nil {
+			logrus.Errorf("Cache: failed to save raw WHOIS response to cache layer: %v", err.Error())
+		} else {
+			logrus.Debugf("Cache: successfully saved raw WHOIS response for %s", punycodeDomain)
+		}
+	})
+
+	return raw, nil
 }
 
 func (s *WhoisService) GetWhoisData(ctx context.Context, domain string) (*domain.WhoisInfo, error) {
@@ -52,9 +86,22 @@ func (s *WhoisService) GetWhoisData(ctx context.Context, domain string) (*domain
 		)
 	}
 
-	rawWhoisData, err := s.whoisClient.Whois(ctx, punycodeDomain)
+	parsed, err := s.cache.GetParsed(ctx, punycodeDomain)
+	if err == nil {
+		logrus.Debugf("Cache: successfully retrieved parsed WHOIS response for %s", punycodeDomain)
+		return parsed, nil
+	}
+	if !errors.Is(err, &apperrors.AppError{}) {
+		logrus.Errorf("Cache: failed to get parsed WHOIS response from cache layer: %v", err.Error())
+	}
+
+	rawWhoisData, err := s.GetRawWhoisData(ctx, punycodeDomain)
 	if err != nil {
-		return nil, err
+		if errors.Is(err, &apperrors.AppError{}) {
+			return nil, err
+		}
+		logrus.Errorf("WhoisService: failed to get raw WHOIS response: %v", err.Error())
+		return nil, apperrors.ErrInternal
 	}
 
 	whoisInfo, err := s.parserService.Parse(ctx, rawWhoisData, nativeDomain)
@@ -64,6 +111,15 @@ func (s *WhoisService) GetWhoisData(ctx context.Context, domain string) (*domain
 		}
 		return nil, apperrors.New(apperrors.CodeDomainNotFound, http.StatusNotFound, "An error occurred while attempting to parse the response from the WHOIS server. Try using a Raw WHOIS Query.")
 	}
+
+	// Cache parsed asynchronously
+	_ = workerpool.Submit(func() {
+		if err := s.cache.SetParsed(ctx, punycodeDomain, whoisInfo, 24*time.Hour); err != nil {
+			logrus.Errorf("Cache: failed to save parsed WHOIS response to cache layer: %v", err.Error())
+		} else {
+			logrus.Debugf("Cache: successfully saved parsed WHOIS response for %s", punycodeDomain)
+		}
+	})
 
 	return whoisInfo, nil
 }

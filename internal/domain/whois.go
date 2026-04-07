@@ -1,7 +1,5 @@
 package domain
 
-import "time"
-
 type WhoisInfoList struct {
 	IsError   bool       `json:"is_error"`
 	ErrorCode string     `json:"error_code,omitempty"`
@@ -18,18 +16,18 @@ type WhoisInfo struct {
 	Billing        *WhoisContact `json:"billing"`
 }
 type WhoisDomain struct {
-	ID          string     `json:"id"`
-	Domain      string     `json:"domain"`
-	Punycode    string     `json:"punycode"`
-	Name        string     `json:"name"`
-	Extension   string     `json:"extension"`
-	WhoisServer string     `json:"whois_server"`
-	Status      []string   `json:"status"`
-	NameServers []string   `json:"name_servers"`
-	DNSSec      bool       `json:"dnssec"`
-	CreatedAt   *time.Time `json:"created_at"`
-	UpdatedAt   *time.Time `json:"updated_at"`
-	ExpiresAt   *time.Time `json:"expires_at"`
+	ID          string        `json:"id"`
+	Domain      string        `json:"domain"`
+	Punycode    string        `json:"punycode"`
+	Name        string        `json:"name"`
+	Extension   string        `json:"extension"`
+	WhoisServer string        `json:"whois_server"`
+	Status      []string      `json:"status"`
+	NameServers []string      `json:"name_servers"`
+	DNSSec      bool          `json:"dnssec"`
+	CreatedAt   *FlexibleTime `json:"created_at"`
+	UpdatedAt   *FlexibleTime `json:"updated_at"`
+	ExpiresAt   *FlexibleTime `json:"expires_at"`
 }
 
 type WhoisContact struct {

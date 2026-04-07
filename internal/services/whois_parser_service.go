@@ -28,7 +28,7 @@ func (s *WhoisParserService) Parse(ctx context.Context, whoisData string, target
 			return nil, appErr
 		}
 
-		logrus.Error("LLM Parser error", err.Error())
+		logrus.Error("LLM Parser error: ", err.Error())
 
 		logrus.Debug("WHOIS Parser: fallback to manual whois-parser")
 		return s.ParseWithWhoisParser(ctx, whoisData, targetDomain)
@@ -56,9 +56,9 @@ func (s *WhoisParserService) ParseWithWhoisParser(ctx context.Context, whoisData
 			Status:      parsedResult.Domain.Status,
 			NameServers: parsedResult.Domain.NameServers,
 			DNSSec:      parsedResult.Domain.DNSSec,
-			CreatedAt:   parsedResult.Domain.CreatedDateInTime,
-			UpdatedAt:   parsedResult.Domain.UpdatedDateInTime,
-			ExpiresAt:   parsedResult.Domain.ExpirationDateInTime,
+			CreatedAt:   domain.NewFlexibleTimePtr(parsedResult.Domain.CreatedDateInTime),
+			UpdatedAt:   domain.NewFlexibleTimePtr(parsedResult.Domain.UpdatedDateInTime),
+			ExpiresAt:   domain.NewFlexibleTimePtr(parsedResult.Domain.ExpirationDateInTime),
 		}
 	}
 	if parsedResult.Registrar != nil {

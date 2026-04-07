@@ -1,6 +1,6 @@
 .PHONY: help build clean test deploy destroy plan init lint fmt vet
 
-help
+help:
 	@echo "WHOIS API Lambda Makefile"
 	@echo ""
 	@echo "Available targets:"

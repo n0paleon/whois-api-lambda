@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"os"
 	"time"
+	"whois-api-lambda/internal/adapters/cache"
 	"whois-api-lambda/internal/adapters/handler"
 	"whois-api-lambda/internal/adapters/whois"
 	service "whois-api-lambda/internal/services"
@@ -40,9 +41,13 @@ func main() {
 	// adapters
 	whoisClient := whois.NewClient()
 	llmParser := llm.NewOpenRouterLLMParser(os.Getenv("OPENROUTER_API_KEY"))
+	cacheService, err := cache.NewDynamoDBCache(os.Getenv("DYNAMODB_TABLE_NAME"))
+	if err != nil {
+		log.Fatalf("Failed to create DynamoDB cache: %v", err)
+	}
 
 	whoisParserService := service.NewWhoisParserService(llmParser)
-	whoisService := service.NewWhoisService(whoisClient, whoisParserService)
+	whoisService := service.NewWhoisService(whoisClient, whoisParserService, cacheService)
 	apiGwHandler := handler.NewApiGateway(whoisService)
 
 	e := echo.New()
