@@ -1,0 +1,387 @@
+{
+  "$schema": "https://json-schema.org/draft-07/schema",
+  "title": "WHOIS JSON Schema",
+  "description": "Schema for WHOIS data",
+  "type": "object",
+  "properties": {
+    "domain": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "domain": {
+          "type": "string"
+        },
+        "punycode": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "extension": {
+          "type": "string"
+        },
+        "whois_server": {
+          "type": "string"
+        },
+        "status": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "minItems": 0
+        },
+        "name_servers": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "minItems": 0
+        },
+        "dnssec": {
+          "type": "boolean"
+        },
+        "created_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "updated_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "expires_at": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "created_at",
+        "domain",
+        "extension",
+        "name"
+      ]
+    },
+    "registrar": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "organization": {
+          "type": "string"
+        },
+        "street": {
+          "type": "string"
+        },
+        "city": {
+          "type": "string"
+        },
+        "province": {
+          "type": "string"
+        },
+        "postal_code": {
+          "type": "string"
+        },
+        "country": {
+          "type": "string"
+        },
+        "phone": {
+          "type": "string"
+        },
+        "phone_ext": {
+          "type": "string"
+        },
+        "fax": {
+          "type": "string"
+        },
+        "fax_ext": {
+          "type": "string"
+        },
+        "email": {
+          "type": "string",
+          "format": "email"
+        },
+        "referral_url": {
+          "type": "string",
+          "format": "uri"
+        }
+      },
+      "required": [
+        "city",
+        "country",
+        "email",
+        "fax",
+        "fax_ext",
+        "id",
+        "name",
+        "organization",
+        "phone",
+        "phone_ext",
+        "postal_code",
+        "province",
+        "referral_url",
+        "street"
+      ]
+    },
+    "registrant": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "organization": {
+          "type": "string"
+        },
+        "street": {
+          "type": "string"
+        },
+        "city": {
+          "type": "string"
+        },
+        "province": {
+          "type": "string"
+        },
+        "postal_code": {
+          "type": "string"
+        },
+        "country": {
+          "type": "string"
+        },
+        "phone": {
+          "type": "string"
+        },
+        "phone_ext": {
+          "type": "string"
+        },
+        "fax": {
+          "type": "string"
+        },
+        "fax_ext": {
+          "type": "string"
+        },
+        "email": {
+          "type": "string"
+        },
+        "referral_url": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "city",
+        "country",
+        "email",
+        "fax",
+        "fax_ext",
+        "id",
+        "name",
+        "organization",
+        "phone",
+        "phone_ext",
+        "postal_code",
+        "province",
+        "referral_url",
+        "street"
+      ]
+    },
+    "administrative": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "organization": {
+          "type": "string"
+        },
+        "street": {
+          "type": "string"
+        },
+        "city": {
+          "type": "string"
+        },
+        "province": {
+          "type": "string"
+        },
+        "postal_code": {
+          "type": "string"
+        },
+        "country": {
+          "type": "string"
+        },
+        "phone": {
+          "type": "string"
+        },
+        "phone_ext": {
+          "type": "string"
+        },
+        "fax": {
+          "type": "string"
+        },
+        "fax_ext": {
+          "type": "string"
+        },
+        "email": {
+          "type": "string",
+          "format": "email"
+        },
+        "referral_url": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "city",
+        "country",
+        "email",
+        "fax",
+        "fax_ext",
+        "id",
+        "name",
+        "organization",
+        "phone",
+        "phone_ext",
+        "postal_code",
+        "province",
+        "referral_url",
+        "street"
+      ]
+    },
+    "technical": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "organization": {
+          "type": "string"
+        },
+        "street": {
+          "type": "string"
+        },
+        "city": {
+          "type": "string"
+        },
+        "province": {
+          "type": "string"
+        },
+        "postal_code": {
+          "type": "string"
+        },
+        "country": {
+          "type": "string"
+        },
+        "phone": {
+          "type": "string"
+        },
+        "phone_ext": {
+          "type": "string"
+        },
+        "fax": {
+          "type": "string"
+        },
+        "fax_ext": {
+          "type": "string"
+        },
+        "email": {
+          "type": "string"
+        },
+        "referral_url": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "city",
+        "country",
+        "email",
+        "fax",
+        "fax_ext",
+        "id",
+        "name",
+        "organization",
+        "phone",
+        "phone_ext",
+        "postal_code",
+        "province",
+        "referral_url",
+        "street"
+      ]
+    },
+    "billing": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "organization": {
+          "type": "string"
+        },
+        "street": {
+          "type": "string"
+        },
+        "city": {
+          "type": "string"
+        },
+        "province": {
+          "type": "string"
+        },
+        "postal_code": {
+          "type": "string"
+        },
+        "country": {
+          "type": "string"
+        },
+        "phone": {
+          "type": "string"
+        },
+        "phone_ext": {
+          "type": "string"
+        },
+        "fax": {
+          "type": "string"
+        },
+        "fax_ext": {
+          "type": "string"
+        },
+        "email": {
+          "type": "string"
+        },
+        "referral_url": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "city",
+        "country",
+        "email",
+        "fax",
+        "fax_ext",
+        "id",
+        "name",
+        "organization",
+        "phone",
+        "phone_ext",
+        "postal_code",
+        "province",
+        "referral_url",
+        "street"
+      ]
+    }
+  },
+  "required": [
+    "domain"
+  ]
+}
