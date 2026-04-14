@@ -72,8 +72,8 @@ func (p *OpenRouterLLMParser) Parse(ctx context.Context, whoisData string, targe
 				4. Strictly use RFC3339 format for all date-time fields (e.g., 2006-01-02T15:04:05Z or 2006-01-02T15:04:05+00:00). Never omit the colon in the timezone offset.
 				5. The "registrar," "registrant," "administrative," "technical," and "billing" fields should be null if there is no associated data at all.
 				6. If the WHOIS data indicates the domain does not exist, is invalid, or no valid information is found, set the "domain" field to null.
-				7. domain.domain: Full domain name in its original Unicode/Native character (e.g., 测试.com)
-				8. domain.punycode: Full domain name in Punycode format (e.g., XN--0ZWM56D.COM)
+				7. domain.domain: Full domain name in its original Unicode/Native character (e.g., 测试.com, google.com, wikipedia.org, etc).
+				8. domain.punycode: Full domain name in Punycode format (e.g., XN--0ZWM56D.COM).
 				9. domain.name: The label part ONLY (without extension) in Unicode/Native character (e.g., 测试).
 				10. domain.extension: The TLD part ONLY (e.g., com).
 				11. IDN Decoding: If the input is in Punycode (xn--), you MUST decode it to its native Unicode representation for the domain.domain and domain.name fields.

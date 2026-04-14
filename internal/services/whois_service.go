@@ -2,7 +2,6 @@ package services
 
 import (
 	"context"
-	"errors"
 	"net/http"
 	"sync"
 	"time"
@@ -53,8 +52,8 @@ func (s *WhoisService) GetRawWhoisData(ctx context.Context, domain string) (stri
 		logrus.Debugf("Cache: successfully retrieved raw WHOIS response for %s", punycodeDomain)
 		return raw, nil
 	}
-	if !errors.Is(err, &apperrors.AppError{}) {
-		logrus.Errorf("Cache: failed to get raw WHOIS response from cache layer: %v", err.Error())
+	if !apperrors.IsAppError(err) {
+		logrus.Warnf("Cache: failed to get raw WHOIS response from cache layer: %v", err.Error())
 	}
 
 	// Fetch live
@@ -91,13 +90,13 @@ func (s *WhoisService) GetWhoisData(ctx context.Context, domain string) (*domain
 		logrus.Debugf("Cache: successfully retrieved parsed WHOIS response for %s", punycodeDomain)
 		return parsed, nil
 	}
-	if !errors.Is(err, &apperrors.AppError{}) {
-		logrus.Errorf("Cache: failed to get parsed WHOIS response from cache layer: %v", err.Error())
+	if !apperrors.IsAppError(err) {
+		logrus.Warnf("Cache: failed to get parsed WHOIS response from cache layer: %v", err.Error())
 	}
 
 	rawWhoisData, err := s.GetRawWhoisData(ctx, punycodeDomain)
 	if err != nil {
-		if errors.Is(err, &apperrors.AppError{}) {
+		if apperrors.IsAppError(err) {
 			return nil, err
 		}
 		logrus.Errorf("WhoisService: failed to get raw WHOIS response: %v", err.Error())

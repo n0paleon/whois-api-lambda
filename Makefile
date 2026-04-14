@@ -14,7 +14,7 @@ build:
 	mkdir -p build
 
 # 	Compress the binary with UPX
-	upx -3 bootstrap
+	upx -2 bootstrap
 
 	zip -q build/lambda.zip bootstrap
 	rm bootstrap

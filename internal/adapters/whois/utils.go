@@ -24,7 +24,7 @@ func GetWhoisServer(query string) (*WhoisServer, error) {
 	}
 
 	if z.WhoisServer() == "" && z.WhoisURL() == "" {
-		return nil, apperrors.Newf(apperrors.CodeNoValidWhoisServer, http.StatusBadRequest, "no valid whois server found for %s", query)
+		return &defaultWhoisServer, nil
 	}
 
 	return &WhoisServer{
