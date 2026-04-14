@@ -82,7 +82,7 @@ func TestParseWhoisData(t *testing.T) {
 
 	// Check dates
 	expectedCreated, _ := time.Parse(time.RFC3339, "1995-08-14T04:00:00Z")
-	assert.Equal(t, &expectedCreated, whoisInfo.Domain.CreatedAt)
+	assert.Equal(t, expectedCreated, whoisInfo.Domain.CreatedAt.Time)
 
 	// Check registrar
 	assert.NotNil(t, whoisInfo.Registrar)
