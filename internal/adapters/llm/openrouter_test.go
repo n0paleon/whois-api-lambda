@@ -8,6 +8,7 @@ import (
 	"testing"
 	"time"
 
+	"whois-api-lambda/internal/adapters/whois"
 	"whois-api-lambda/internal/domain"
 
 	"github.com/stretchr/testify/assert"
@@ -100,73 +101,21 @@ func TestParseWhoisDataIntegration(t *testing.T) {
 		t.Skip("OPENROUTER_API_KEY not set in .env.test, skipping integration test")
 	}
 
+	targetDomain := "microsoft.com"
+
 	parser := NewOpenRouterLLMParser(apiKey)
 
-	// Dummy WHOIS data
-	whoisData := `
-Domain Name: claude.ai
-Registry Domain ID: be3cad9a48374aa88e0259e019d4270d-DONUTS
-Registrar WHOIS Server: whois.markmonitor.com
-Registrar URL: http://www.markmonitor.com
-Updated Date: 2025-01-17T19:25:43Z
-Creation Date: 2018-08-04T15:48:43Z
-Registry Expiry Date: 2029-08-04T15:48:44Z
-Registrar: MarkMonitor Inc.
-Registrar IANA ID: 292
-Registrar Abuse Contact Email: abusecomplaints@markmonitor.com
-Registrar Abuse Contact Phone: +1.2083895740
-Domain Status: clientDeleteProhibited https://icann.org/epp#clientDeleteProhibited
-Domain Status: clientTransferProhibited https://icann.org/epp#clientTransferProhibited
-Domain Status: clientUpdateProhibited https://icann.org/epp#clientUpdateProhibited
-Registry Registrant ID: 3c75800c8cc9471ea43e70fe86c91bad-DONUTS
-Registrant Name: Domain Administrator
-Registrant Organization: Anthropic PBC
-Registrant Street: 548 Market St PMB 90375
-Registrant City: San Francisco
-Registrant State/Province: CA
-Registrant Postal Code: 94104
-Registrant Country: US
-Registrant Phone: +1.4153266303
-Registrant Phone Ext: 
-Registrant Fax: 
-Registrant Fax Ext: 
-Registrant Email: domains@anthropic.com
-Registry Admin ID: 3c75800c8cc9471ea43e70fe86c91bad-DONUTS
-Admin Name: Domain Administrator
-Admin Organization: Anthropic PBC
-Admin Street: 548 Market St PMB 90375
-Admin City: San Francisco
-Admin State/Province: CA
-Admin Postal Code: 94104
-Admin Country: US
-Admin Phone: +1.4153266303
-Admin Phone Ext: 
-Admin Fax: 
-Admin Fax Ext: 
-Admin Email: domains@anthropic.com
-Registry Tech ID: 3c75800c8cc9471ea43e70fe86c91bad-DONUTS
-Tech Name: Domain Administrator
-Tech Organization: Anthropic PBC
-Tech Street: 548 Market St PMB 90375
-Tech City: San Francisco
-Tech State/Province: CA
-Tech Postal Code: 94104
-Tech Country: US
-Tech Phone: +1.4153266303
-Tech Phone Ext: 
-Tech Fax: 
-Tech Fax Ext: 
-Tech Email: domains@anthropic.com
-Name Server: isla.ns.cloudflare.com
-Name Server: randy.ns.cloudflare.com
-DNSSEC: unsigned
-URL of the ICANN Whois Inaccuracy Complaint Form: https://icann.org/wicf/
->>> Last update of WHOIS database: 2026-04-05T19:28:29Z <<<
-`
+	// Fetch real WHOIS data using the native client
+	whoisClient := whois.NewClient()
+	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+	defer cancel()
+
+	whoisData, err := whoisClient.Whois(ctx, targetDomain)
+	require.NoError(t, err)
+	assert.NotEmpty(t, whoisData)
 
 	// Call Parse
-	ctx := context.Background()
-	whoisInfo, err := parser.Parse(ctx, whoisData, "claude.ai")
+	whoisInfo, err := parser.Parse(ctx, whoisData, targetDomain)
 
 	// Assert no error
 	assert.NoError(t, err)
@@ -179,10 +128,11 @@ URL of the ICANN Whois Inaccuracy Complaint Form: https://icann.org/wicf/
 	// Basic checks - the LLM should extract key information
 	// Note: Exact values depend on LLM interpretation
 	if whoisInfo.Domain != nil {
-		assert.Equal(t, "claude.ai", whoisInfo.Domain.Domain)
+		assert.Equal(t, targetDomain, whoisInfo.Domain.Domain)
 	}
 
 	if whoisInfo.Registrar != nil {
-		assert.Contains(t, whoisInfo.Registrar.Name, "MarkMonitor")
+		registrarNameNOrg := whoisInfo.Registrar.Name + "\n" + whoisInfo.Registrar.Organization
+		assert.Contains(t, registrarNameNOrg, "MarkMonitor")
 	}
 }

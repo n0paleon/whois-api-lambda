@@ -69,7 +69,7 @@ func (c *Client) Whois(ctx context.Context, query string) (string, error) {
 		client := who.NewClient()
 		client.SetDisableReferral(false)
 		client.SetDisableStats(true)
-		client.SetDisableReferralChain(false)
+		client.SetDisableReferralChain(true)
 
 		var serverHost string
 		if utils.IsValidIP(query) {
