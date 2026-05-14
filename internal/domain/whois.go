@@ -1,5 +1,7 @@
 package domain
 
+import "strings"
+
 type WhoisInfoList struct {
 	IsError   bool       `json:"is_error"`
 	ErrorCode string     `json:"error_code,omitempty"`
@@ -31,18 +33,38 @@ type WhoisDomain struct {
 }
 
 type WhoisContact struct {
-	ID           string `json:"id,"`
+	ID           string `json:"id"`
 	Name         string `json:"name"`
 	Organization string `json:"organization"`
-	Street       string `json:"street,"`
-	City         string `json:"city,"`
-	Province     string `json:"province,"`
-	PostalCode   string `json:"postal_code,"`
-	Country      string `json:"country,"`
-	Phone        string `json:"phone,"`
-	PhoneExt     string `json:"phone_ext,"`
-	Fax          string `json:"fax,"`
-	FaxExt       string `json:"fax_ext,"`
-	Email        string `json:"email,"`
-	ReferralURL  string `json:"referral_url,"`
+	Street       string `json:"street"`
+	City         string `json:"city"`
+	Province     string `json:"province"`
+	PostalCode   string `json:"postal_code"`
+	Country      string `json:"country"`
+	Phone        string `json:"phone"`
+	PhoneExt     string `json:"phone_ext"`
+	Fax          string `json:"fax"`
+	FaxExt       string `json:"fax_ext"`
+	Email        string `json:"email"`
+	ReferralURL  string `json:"referral_url"`
+}
+
+func (c *WhoisContact) IsEmpty() bool {
+	if c == nil {
+		return true
+	}
+	return strings.TrimSpace(c.ID) == "" &&
+		strings.TrimSpace(c.Name) == "" &&
+		strings.TrimSpace(c.Organization) == "" &&
+		strings.TrimSpace(c.Street) == "" &&
+		strings.TrimSpace(c.City) == "" &&
+		strings.TrimSpace(c.Province) == "" &&
+		strings.TrimSpace(c.PostalCode) == "" &&
+		strings.TrimSpace(c.Country) == "" &&
+		strings.TrimSpace(c.Phone) == "" &&
+		strings.TrimSpace(c.PhoneExt) == "" &&
+		strings.TrimSpace(c.Fax) == "" &&
+		strings.TrimSpace(c.FaxExt) == "" &&
+		strings.TrimSpace(c.Email) == "" &&
+		strings.TrimSpace(c.ReferralURL) == ""
 }

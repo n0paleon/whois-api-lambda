@@ -101,7 +101,7 @@ func TestParseWhoisDataIntegration(t *testing.T) {
 		t.Skip("OPENROUTER_API_KEY not set in .env.test, skipping integration test")
 	}
 
-	targetDomain := "microsoft.com"
+	targetDomain := "domainesia.com"
 
 	parser := NewOpenRouterLLMParser(apiKey)
 

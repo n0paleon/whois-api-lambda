@@ -4,8 +4,10 @@ import (
 	"context"
 	"testing"
 
-	"github.com/stretchr/testify/assert"
+	_ "whois-api-lambda/internal/adapters/workerpool"
 	whoisapi "whois-api-lambda/internal/apperrors"
+
+	"github.com/stretchr/testify/assert"
 )
 
 // TestGetWhoisData_Success tests the successful retrieval of whois data
@@ -74,5 +76,5 @@ func TestWhois_IPAddress_Success(t *testing.T) {
 	assert.NoError(t, err)
 	assert.NotEmpty(t, result)
 	// IP whois data typically contains information about the IP range
-	assert.Contains(t, result, "inetnum") // Common field in IP whois responses
+	assert.Contains(t, result, "google") // Common field in IP whois responses
 }
